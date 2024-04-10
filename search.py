@@ -79,7 +79,6 @@ def tree_search(problem):
             frontier
         )
         frontier.remove(node)
-        assert node.cost == 1, "no possible path"
         # if the node contains a goal state then return the corresponding solution
         if problem['goal_test'](node.state):
             return list(solution(node))
@@ -116,7 +115,6 @@ def graph_search(problem):
             frontier
         )
         frontier.remove(node)
-        assert node.cost == 1, "no possible path"
         # if the node contains a goal state then return the corresponding solution
         if problem['goal_test'](node.state):
             return list(solution(node))
@@ -152,7 +150,6 @@ def uniform_cost_search(problem):
         assert not frontier.empty(), "frontier is empty"
         # chooses the lowest-cost node in frontier
         node = frontier.get(block=False)
-        assert node.cost == 1, "no possible path"
         if problem['goal_test'](node.state):
             return list(solution(node))
         explored.add(node.state)
