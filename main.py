@@ -1,8 +1,8 @@
-from problem_solving_agent import (
-  TreeSearchAgent,
-  UniformCostSearchAgent
-)
 from environment import env, run_experiment
+from problem_solving_agent import (
+    TreeSearchAgent,
+    UniformCostSearchAgent
+)
 
 
 env.action_space.seed(0)
