@@ -16,7 +16,7 @@ from collections import namedtuple
 from queue import PriorityQueue
 
 Node = namedtuple('Node', ['cost', 'state', 'parent', 'action'])
-
+_maxsize = 140
 
 def child_node(problem, node, action):
     """Child node
@@ -96,7 +96,7 @@ def uniform_cost_search(problem):
     # node = a node with STATE = problem.START, PATH-COST = 0
     node = Node(0, problem['initial_state'], None, -1)
     # frontier = a priority queue ordered by PATH-COST, with node as the only element
-    frontier = PriorityQueue(problem['state_space'].n)
+    frontier = PriorityQueue(_maxsize)
     frontier.put(node, block=False)
     explored = set()
     while True:
@@ -150,8 +150,7 @@ if __name__ == '__main__':
         if state + 4 in env.observation_space:
             yield 3
 
-    result = uniform_cost_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state ==
-                                 15, state_space=env.observation_space, planning=defaultdict(dict)))
+    result = uniform_cost_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state == 15, state_space=env.observation_space, planning=defaultdict(dict)))
     print(result)
     result = tree_search(dict(initial_state=0, actions=action_range, goal_test =lambda state: state == 15, state_space = env.observation_space, planning=defaultdict(dict)))
     print(result)
