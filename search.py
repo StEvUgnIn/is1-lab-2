@@ -18,6 +18,21 @@ from queue import PriorityQueue
 Node = namedtuple('Node', ['cost', 'state', 'parent', 'action'])
 _maxsize = 140
 
+
+def solution(node):
+    """Returns the action sequence (list)
+
+    Args:
+        node (Node): a node
+
+    Yields:
+        iterable[int]: an action sequence
+    """
+    while node.parent:
+        yield node.action
+        node = node.parent
+
+
 def child_node(problem, node, action):
     """Child node
 
@@ -115,20 +130,6 @@ def uniform_cost_search(problem):
                 # replace that frontier node with child
                 frontier.queue.remove(node)
                 frontier.put(child, block=False)
-
-
-def solution(node):
-    """Returns the action sequence (list)
-
-    Args:
-        node (Node): a node
-
-    Yields:
-        iterable[int]: an action sequence
-    """
-    while node.parent:
-        yield node.action
-        node = node.parent
 
 
 if __name__ == '__main__':
