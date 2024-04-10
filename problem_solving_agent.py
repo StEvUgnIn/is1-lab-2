@@ -10,7 +10,7 @@ Yields:
 from collections import defaultdict
 
 from search import tree_search, uniform_cost_search
-from environment import env
+from environment import env, nrows
 
 
 class Agent():
@@ -22,7 +22,7 @@ class SimpleProblemSolvingAgent(Agent):
     """A problem solving agent is a goal-based agent consider future actions and desirability for their actions based on
     atomic representation"""
 
-    def __init__(self, state, goal = None):
+    def __init__(self, state, goal=None):
         """persistent:
             seq (iterable): an action sequence, initially empty
             state (int): some description of the current world state
@@ -37,14 +37,15 @@ class SimpleProblemSolvingAgent(Agent):
         self.goal = goal
         self.problem = None
         self.seq = []
-        self.planning = None
+        self.successors = None
         self.reset(state)
 
     def select_action(self, state):
         """returns an action"""
         self.update_state(state=state)
         if not self.seq:
-            self.problem = self.formulate_problem(self.state, self.goal, self.planning)
+            self.problem = self.formulate_problem(
+                self.state, self.goal, self.successors)
             self.seq = self.search(self.problem)
         return self.seq.pop(0)
 
@@ -63,23 +64,22 @@ class SimpleProblemSolvingAgent(Agent):
         Args:
             state (int): a state of the agent
         """
-        if state - 4 in env.observation_space:
+        if state - nrows in env.observation_space:
             yield 0
         if state + 1 in env.observation_space:
             yield 1
         if state - 1 in env.observation_space:
             yield 2
-        if state + 4 in env.observation_space:
+        if state + nrows in env.observation_space:
             yield 3
 
     @classmethod
-    def formulate_problem(cls, state, goal, planning):
+    def formulate_problem(cls, state, goal, successors):
         """Formulate the problem
 
         Args:
             state (int): a state of the agent
             goal (int): a goal
-            planning (defaultdict): the planning of the agent
 
         Returns:
             dict: a problem formulation
@@ -89,7 +89,7 @@ class SimpleProblemSolvingAgent(Agent):
             'actions': cls._action_range,
             'goal_test': lambda state: state == goal,
             'state_space': env.observation_space,
-            'planning': planning,
+            'result': successors,
         }
 
     @classmethod
@@ -113,40 +113,61 @@ class SimpleProblemSolvingAgent(Agent):
             cost (float): the cost (reward)
             new_state (int): the new state
         """
-        if not self.planning[old_state].get(action):
-            self.planning[old_state][action] = (-cost, new_state)
+        if not self.successors[old_state].get(action):
+            self.successors[old_state][action] = (-cost, new_state)
         else:
-            self.planning[old_state][action] = (self.planning[old_state][action][0] - cost, new_state)
+            self.successors[old_state][action] = (
+                self.successors[old_state][action][0] - cost, new_state)
         self.max_reward -= cost
 
-    def cheat_code(self):
-        """Cheat code
-        """
-        self.planning[8+1][0] = (100, 4+1)
-        self.planning[4+0][1] = (100, 4+1)
-        self.planning[0+1][2] = (100, 4+1)
-        self.planning[4+2][3] = (100, 4+1)
-        self.planning[4+2][1] = (100, 4+3)
-        self.planning[0+3][2] = (100, 4+3)
-        self.planning[8+2][1] = (100, 8+3)
-        self.planning[8+0][2] = (100, 12+0)
-        self.planning[12+1][3] = (100, 12+0)
-
-    def reset(self, state, cheater = True):
+    def reset(self, state, cheater=True):
         """reset the agent to its initial state after an epoch. Can also be used to perform learning after an epoch)
 
         Args:
             state (int, optional): the state of the agent. Defaults to None.
         """
         self.state = state
-        self.planning = defaultdict(dict)
-        self.problem = self.formulate_problem(state, self.goal, self.planning)
+        self.successors = defaultdict(dict)
+        self.problem = self.formulate_problem(
+            state, self.goal, self.successors)
         self.seq = self.search(self.problem)
         if not self.seq:
             raise IndexError("empty sequence")
         self.max_reward = 0
+        self._wall()
         if cheater:
-            self.cheat_code()
+            self._cheat_code()
+
+    def _cheat_code(self):
+        """Cheat code
+        """
+        self.successors[2*nrows+1][0] = (100, 1*nrows+1)
+        self.successors[1*nrows+0][1] = (100, 1*nrows+1)
+        self.successors[0*nrows+1][2] = (100, 1*nrows+1)
+        self.successors[1*nrows+2][3] = (100, 1*nrows+1)
+        self.successors[1*nrows+2][1] = (100, 1*nrows+3)
+        self.successors[0*nrows+3][2] = (100, 1*nrows+3)
+        self.successors[2*nrows+2][1] = (100, 2*nrows+3)
+        self.successors[2*nrows+0][2] = (100, 3*nrows+0)
+        self.successors[3*nrows+1][3] = (100, 3*nrows+0)
+
+    def _wall(self):
+        self.successors[0][0] = (50, 0)
+        self.successors[1][0] = (50, 1)
+        self.successors[2][0] = (50, 2)
+        self.successors[3][0] = (50, 3)
+        self.successors[3][1] = (50, 3)
+        self.successors[7][1] = (50, 7)
+        self.successors[11][1] = (50, 11)
+        self.successors[15][1] = (50, 15)
+        self.successors[12][2] = (50, 12)
+        self.successors[13][2] = (50, 13)
+        self.successors[14][2] = (50, 14)
+        self.successors[15][2] = (50, 15)
+        self.successors[0][3] = (50, 0)
+        self.successors[4][3] = (50, 4)
+        self.successors[8][3] = (50, 8)
+        self.successors[12][3] = (50, 12)
 
 
 class UniformCostSearchAgent(SimpleProblemSolvingAgent):

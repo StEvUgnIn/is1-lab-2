@@ -15,6 +15,8 @@ from functools import reduce
 from collections import namedtuple
 from queue import PriorityQueue
 
+from environment import nrows
+
 Node = namedtuple('Node', ['cost', 'state', 'parent', 'action'])
 _maxsize = 140
 
@@ -48,10 +50,10 @@ def child_node(problem, node, action):
     assert isinstance(node, Node)
     assert isinstance(action, int)
     children = {
-        0: Node(*problem['planning'][node.state].get(action, (0, node.state - 4)), node, 0),
-        1: Node(*problem['planning'][node.state].get(action, (0, node.state + 1)), node, 1),
-        2: Node(*problem['planning'][node.state].get(action, (0, node.state - 1)), node, 2),
-        3: Node(*problem['planning'][node.state].get(action, (0, node.state + 4)), node, 3),
+        0: Node(*problem['result'][node.state].get(0, (0, node.state - nrows)), node, 0),
+        1: Node(*problem['result'][node.state].get(1, (0, node.state + 1)), node, 1),
+        2: Node(*problem['result'][node.state].get(2, (0, node.state - 1)), node, 2),
+        3: Node(*problem['result'][node.state].get(3, (0, node.state + nrows)), node, 3),
     }
     assert action in children.keys(), "action needs to be in action space"
     assert children[action].state in problem['state_space']
@@ -142,16 +144,18 @@ if __name__ == '__main__':
         Args:
             state (int): state of agent
         """
-        if state - 4 in env.observation_space:
+        if state - nrows in env.observation_space:
             yield 0
         if state + 1 in env.observation_space:
             yield 1
         if state - 1 in env.observation_space:
             yield 2
-        if state + 4 in env.observation_space:
+        if state + nrows in env.observation_space:
             yield 3
 
-    result = uniform_cost_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state == 15, state_space=env.observation_space, planning=defaultdict(dict)))
+    result = uniform_cost_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state ==
+                                 15, state_space=env.observation_space, result=defaultdict(dict)))
     print(result)
-    result = tree_search(dict(initial_state=0, actions=action_range, goal_test =lambda state: state == 15, state_space = env.observation_space, planning=defaultdict(dict)))
+    result = tree_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state ==
+                         15, state_space=env.observation_space, result=defaultdict(dict)))
     print(result)

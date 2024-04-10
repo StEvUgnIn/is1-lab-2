@@ -14,10 +14,12 @@ RENDER_FREQUENCY = 0.2  # output the game state at most every X seconds
 env = gym.make('FrozenLake-v1', render_mode="rgb_array" if RENDER_MODE ==
                "graphic" else "ansi")  # initialize the game
 
+nrows = 4
+
 
 def to_coord(state_id):
     # we return the (x, y) coorinates, in the description page the use [y, x] to describe the locations
-    return (state_id % 4, state_id // 4)
+    return (state_id % nrows, state_id // nrows)
 
 
 actions = {
