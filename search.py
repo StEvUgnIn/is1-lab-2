@@ -46,15 +46,15 @@ def child_node(problem, node, action):
     assert isinstance(node, Node)
     assert isinstance(action, int)
     children = (
-        Node(*problem['result'][node.state].get(0, (1, node.state - nrows)), node, 0),
-        Node(*problem['result'][node.state].get(1, (1, node.state + 1)), node, 1),
-        Node(*problem['result'][node.state].get(2, (1, node.state - 1)), node, 2),
-        Node(*problem['result'][node.state].get(3, (1, node.state + nrows)), node, 3),
+        Node(*problem['result'][node.state].get(0, (1, node.state - 1)), node, 0),
+        Node(*problem['result'][node.state].get(1, (1, node.state + nrows)), node, 1),
+        Node(*problem['result'][node.state].get(2, (1, node.state + 1)), node, 2),
+        Node(*problem['result'][node.state].get(3, (1, node.state - nrows)), node, 3),
     )
     assert action > -1 and action < len(children), "action needs to be in action space"
     child = children[action]
-    assert child.state in problem['state_space']
-
+    if child.state not in problem['state_space']:
+        child = Node(50, child.state, child.parent, child.action)
     return child
 
 
@@ -173,13 +173,13 @@ if __name__ == '__main__':
         Args:
             state (int): state of agent
         """
-        if state - nrows in env.observation_space:
-            yield 0
-        if state + 1 in env.observation_space:
-            yield 1
         if state - 1 in env.observation_space:
-            yield 2
+            yield 0
         if state + nrows in env.observation_space:
+            yield 1
+        if state + 1 in env.observation_space:
+            yield 2
+        if state - nrows in env.observation_space:
             yield 3
 
     result = uniform_cost_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state ==

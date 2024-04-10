@@ -64,13 +64,13 @@ class SimpleProblemSolvingAgent(Agent):
         Args:
             state (int): a state of the agent
         """
-        if state - nrows in env.observation_space:
-            yield 0
-        if state + 1 in env.observation_space:
-            yield 1
         if state - 1 in env.observation_space:
-            yield 2
+            yield 0
         if state + nrows in env.observation_space:
+            yield 1
+        if state + 1 in env.observation_space:
+            yield 2
+        if state - nrows in env.observation_space:
             yield 3
 
     @classmethod

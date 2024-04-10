@@ -24,8 +24,8 @@ def to_coord(state_id):
 
 actions = (
     "left",
-    "right",
     "down",
+    "right",
     "up",
 )
 
