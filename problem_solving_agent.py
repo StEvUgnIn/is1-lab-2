@@ -132,7 +132,7 @@ class SimpleProblemSolvingAgent(Agent):
         self.planning[8+0][2] = (100, 12+0)
         self.planning[12+1][3] = (100, 12+0)
 
-    def reset(self, state, cheater = False):
+    def reset(self, state, cheater = True):
         """reset the agent to its initial state after an epoch. Can also be used to perform learning after an epoch)
 
         Args:
