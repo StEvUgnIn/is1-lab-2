@@ -50,10 +50,10 @@ def child_node(problem, node, action):
     assert isinstance(node, Node)
     assert isinstance(action, int)
     children = {
-        0: Node(*problem['result'][node.state].get(0, (0, node.state - nrows)), node, 0),
-        1: Node(*problem['result'][node.state].get(1, (0, node.state + 1)), node, 1),
-        2: Node(*problem['result'][node.state].get(2, (0, node.state - 1)), node, 2),
-        3: Node(*problem['result'][node.state].get(3, (0, node.state + nrows)), node, 3),
+        0: Node(*problem['result'][node.state].get(0, (1, node.state - nrows)), node, 0),
+        1: Node(*problem['result'][node.state].get(1, (1, node.state + 1)), node, 1),
+        2: Node(*problem['result'][node.state].get(2, (1, node.state - 1)), node, 2),
+        3: Node(*problem['result'][node.state].get(3, (1, node.state + nrows)), node, 3),
     }
     assert action in children.keys(), "action needs to be in action space"
     assert children[action].state in problem['state_space']
@@ -73,8 +73,9 @@ def tree_search(problem):
         list[int]: an action sequence
     """
     # initialize the frontier using the initial state of problem
-    node = Node(0, problem['initial_state'], None, -1)
+    node = Node(1, problem['initial_state'], None, -1)
     frontier = [node]
+    explored = set()
     while True:
         if not frontier:
             raise RecursionError("frontier is empty")
@@ -88,9 +89,10 @@ def tree_search(problem):
         if problem['goal_test'](node.state):
             return list(solution(node))
         # expand the chosen node, adding the resulting nodes to the frontier
+        explored.add(node.state)
         for action in problem['actions'](node.state):
             child = child_node(problem, node, action)
-            if child not in frontier:
+            if child.state not in explored and child not in frontier:
                 frontier.append(child)
             elif child in frontier and node.cost > child.cost:
                 # replace that frontier node with child
@@ -111,7 +113,7 @@ def uniform_cost_search(problem):
         list[int]: an action sequence
     """
     # node = a node with STATE = problem.START, PATH-COST = 0
-    node = Node(0, problem['initial_state'], None, -1)
+    node = Node(1, problem['initial_state'], None, -1)
     # frontier = a priority queue ordered by PATH-COST, with node as the only element
     frontier = PriorityQueue(_maxsize)
     frontier.put(node, block=False)
