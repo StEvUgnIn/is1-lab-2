@@ -22,12 +22,12 @@ def to_coord(state_id):
     return (state_id % nrows, state_id // nrows)
 
 
-actions = {
-    0: "up",
-    1: "right",
-    2: "down",
-    3: "left"
-}
+actions = (
+    "left",
+    "right",
+    "down",
+    "up",
+)
 
 
 def display_game(wait_time_s=RENDER_FREQUENCY):

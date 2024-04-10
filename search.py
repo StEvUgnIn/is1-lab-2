@@ -1,9 +1,5 @@
 """Search algorithms
 
-Raises:
-    RecursionError: frontier is empty
-    RecursionError: frontier is empty
-
 Returns:
     list[int]: an action sequence
 
@@ -68,9 +64,6 @@ def tree_search(problem):
     Args:
         problem (dict): formulation of an agent problem
 
-    Raises:
-        RecursionError: frontier is empty
-
     Returns:
         list[int]: an action sequence
     """
@@ -79,10 +72,14 @@ def tree_search(problem):
     frontier = [node]
     while True:
         # if frontier is empty returns a failure
-        if not frontier:
-            raise RecursionError("frontier is empty")
+        assert frontier, "frontier is empty"
         # choose a leaf node and remove it from the frontier
-        node = frontier.pop()
+        node = reduce(
+            lambda n1, n2: n1 if n1.cost < n2.cost else n2,
+            frontier
+        )
+        frontier.remove(node)
+        assert node.cost == 1, "no possible path"
         # if the node contains a goal state then return the corresponding solution
         if problem['goal_test'](node.state):
             return list(solution(node))
@@ -103,9 +100,6 @@ def graph_search(problem):
     Args:
         problem (dict): formulation of an agent problem
 
-    Raises:
-        RecursionError: frontier is empty
-
     Returns:
         list[int]: an action sequence
     """
@@ -115,10 +109,14 @@ def graph_search(problem):
     explored = set()
     while True:
         # if frontier is empty returns a failure
-        if not frontier:
-            raise RecursionError("frontier is empty")
+        assert frontier, "frontier is empty"
         # choose a leaf node and remove it from the frontier
-        node = frontier.pop()
+        node = reduce(
+            lambda n1, n2: n1 if n1.cost < n2.cost else n2,
+            frontier
+        )
+        frontier.remove(node)
+        assert node.cost == 1, "no possible path"
         # if the node contains a goal state then return the corresponding solution
         if problem['goal_test'](node.state):
             return list(solution(node))
@@ -140,9 +138,6 @@ def uniform_cost_search(problem):
     Args:
         problem (dict): formulation of an agent problem
 
-    Raises:
-        RecursionError: frontier is empty
-
     Returns:
         list[int]: an action sequence
     """
@@ -154,10 +149,10 @@ def uniform_cost_search(problem):
     explored = set()
     while True:
         # if frontier is empty returns a failure
-        if frontier.empty():
-            raise RecursionError("frontier is empty")
+        assert not frontier.empty(), "frontier is empty"
         # chooses the lowest-cost node in frontier
         node = frontier.get(block=False)
+        assert node.cost == 1, "no possible path"
         if problem['goal_test'](node.state):
             return list(solution(node))
         explored.add(node.state)
