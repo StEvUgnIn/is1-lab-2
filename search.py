@@ -49,15 +49,17 @@ def child_node(problem, node, action):
     assert isinstance(problem, dict)
     assert isinstance(node, Node)
     assert isinstance(action, int)
-    children = {
-        0: Node(*problem['result'][node.state].get(0, (1, node.state - nrows)), node, 0),
-        1: Node(*problem['result'][node.state].get(1, (1, node.state + 1)), node, 1),
-        2: Node(*problem['result'][node.state].get(2, (1, node.state - 1)), node, 2),
-        3: Node(*problem['result'][node.state].get(3, (1, node.state + nrows)), node, 3),
-    }
-    assert action in children.keys(), "action needs to be in action space"
-    assert children[action].state in problem['state_space']
-    return children[action]
+    children = (
+        Node(*problem['result'][node.state].get(0, (1, node.state - nrows)), node, 0),
+        Node(*problem['result'][node.state].get(1, (1, node.state + 1)), node, 1),
+        Node(*problem['result'][node.state].get(2, (1, node.state - 1)), node, 2),
+        Node(*problem['result'][node.state].get(3, (1, node.state + nrows)), node, 3),
+    )
+    assert action > -1 and action < len(children), "action needs to be in action space"
+    child = children[action]
+    assert child.state in problem['state_space']
+
+    return child
 
 
 def tree_search(problem):
@@ -75,16 +77,48 @@ def tree_search(problem):
     # initialize the frontier using the initial state of problem
     node = Node(1, problem['initial_state'], None, -1)
     frontier = [node]
-    explored = set()
     while True:
+        # if frontier is empty returns a failure
         if not frontier:
             raise RecursionError("frontier is empty")
         # choose a leaf node and remove it from the frontier
-        node = reduce(
-            lambda n1, n2: n1 if n1.cost < n2.cost else n2,
-            frontier
-        )
-        frontier.remove(node)
+        node = frontier.pop()
+        # if the node contains a goal state then return the corresponding solution
+        if problem['goal_test'](node.state):
+            return list(solution(node))
+        # expand the chosen node, adding the resulting nodes to the frontier
+        for action in problem['actions'](node.state):
+            child = child_node(problem, node, action)
+            if child not in frontier:
+                frontier.append(child)
+            elif child in frontier and node.cost > child.cost:
+                # replace that frontier node with child
+                idx = frontier.index(node)
+                frontier[idx] = child
+
+
+def graph_search(problem):
+    """Returns a solution, or failure
+
+    Args:
+        problem (dict): formulation of an agent problem
+
+    Raises:
+        RecursionError: frontier is empty
+
+    Returns:
+        list[int]: an action sequence
+    """
+    # initialize the frontier using the initial state of problem
+    node = Node(1, problem['initial_state'], None, -1)
+    frontier = [node]
+    explored = set()
+    while True:
+        # if frontier is empty returns a failure
+        if not frontier:
+            raise RecursionError("frontier is empty")
+        # choose a leaf node and remove it from the frontier
+        node = frontier.pop()
         # if the node contains a goal state then return the corresponding solution
         if problem['goal_test'](node.state):
             return list(solution(node))
@@ -119,6 +153,7 @@ def uniform_cost_search(problem):
     frontier.put(node, block=False)
     explored = set()
     while True:
+        # if frontier is empty returns a failure
         if frontier.empty():
             raise RecursionError("frontier is empty")
         # chooses the lowest-cost node in frontier
@@ -158,6 +193,6 @@ if __name__ == '__main__':
     result = uniform_cost_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state ==
                                  15, state_space=env.observation_space, result=defaultdict(dict)))
     print(result)
-    result = tree_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state ==
+    result = graph_search(dict(initial_state=0, actions=action_range, goal_test=lambda state: state ==
                          15, state_space=env.observation_space, result=defaultdict(dict)))
     print(result)

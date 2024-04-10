@@ -1,6 +1,6 @@
 from environment import env, run_experiment
 from problem_solving_agent import (
-    TreeSearchAgent,
+    GraphSearchAgent,
     UniformCostSearchAgent
 )
 
@@ -8,7 +8,7 @@ from problem_solving_agent import (
 env.action_space.seed(0)
 _goal = 15
 observation, info = env.reset()
-informed_agent = TreeSearchAgent(observation, _goal)
+informed_agent = GraphSearchAgent(observation, _goal)
 run_experiment(informed_agent)
 print()
 

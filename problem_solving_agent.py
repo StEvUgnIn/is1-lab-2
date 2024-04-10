@@ -9,7 +9,7 @@ Yields:
 
 from collections import defaultdict
 
-from search import tree_search, uniform_cost_search
+from search import graph_search, uniform_cost_search
 from environment import env, nrows
 
 
@@ -186,8 +186,8 @@ class UniformCostSearchAgent(SimpleProblemSolvingAgent):
         return uniform_cost_search(problem)
 
 
-class TreeSearchAgent(SimpleProblemSolvingAgent):
-    """A tree-search agent is an informed problem solving agent using the A* algorithm to learn the policy of an environment.
+class GraphSearchAgent(SimpleProblemSolvingAgent):
+    """A A* search agent is an informed problem solving agent using the A* algorithm to learn the policy of an environment.
     """
 
     @classmethod
@@ -200,4 +200,4 @@ class TreeSearchAgent(SimpleProblemSolvingAgent):
         Returns:
             list[int]: actions sequence
         """
-        return tree_search(problem)
+        return graph_search(problem)
