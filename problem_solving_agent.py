@@ -24,10 +24,10 @@ class SimpleProblemSolvingAgent(Agent):
 
     def __init__(self, state, goal = None):
         """persistent:
-        seq, an action sequence (iterable), initially empty
-        state, some description of the current world state
-        goal, a goal, initially None
-        problem, a problem formulation
+            seq (iterable): an action sequence, initially empty
+            state (int): some description of the current world state
+            goal (int): a goal, initially None
+            problem (dict): a problem formulation
 
         Args:
             initial_state (int): the initial state of the agent
