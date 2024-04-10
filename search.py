@@ -134,7 +134,7 @@ def uniform_cost_search(problem):
 
 if __name__ == '__main__':
     from collections import defaultdict
-    from ex_B_code import env
+    from environment import env
 
     def action_range(state):
         """Range of actions
